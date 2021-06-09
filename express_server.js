@@ -19,6 +19,15 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/urls/:shortURL", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  const longURL = req.body.longURL;
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
+});
+
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -50,6 +59,13 @@ app.get("/urls.json", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+app.post('/urls/:url/edit', (req, res) => {
+  const urlToBeEdited = req.params.url;
+  
+  res.redirect(`/urls/${urlToBeEdited}`);
+});
+
 
 app.post('/urls/:url/delete', (req, res) => {
   const urlToBeDeleted = req.params.url;
