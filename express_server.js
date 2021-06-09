@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
 
+// middleware
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -41,6 +42,10 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
 });
 
+app.get("/register", (req, res) => {
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  res.render("urls_register", templateVars);
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
