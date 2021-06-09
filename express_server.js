@@ -45,11 +45,11 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
 
   if (!password || !email) {
-    return res.status(401).send('You must enter an email AND a password');
+    return res.status(400).send('You must enter an email AND a password');
   }
 
   if (checkUserExist(email)) {
-    return res.status(401).send('The email you entered has been used. Please enter another email.')
+    return res.status(400).send('The email you entered has been used. Please enter another email.')
   }
 
   // create our new user object
@@ -76,7 +76,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');    
 });
 
@@ -98,17 +98,17 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies["username"] }
+  const templateVars = { user: users[req.cookies["user_id"]] }
   res.render("urls_new", templateVars);
 });
 
