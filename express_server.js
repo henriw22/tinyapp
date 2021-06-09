@@ -9,10 +9,65 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+const checkUserExist = (email) => {
+  const keys = Object.keys(users);
+  for (let key of keys) {
+    if (users[key].email === email) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+app.post('/register', (req, res) => {
+  // grab the information from the body
+  const password = req.body.password;
+  const email = req.body.email;
+
+  if (!password || !email) {
+    return res.status(401).send('You must enter an email AND a password');
+  }
+
+  if (checkUserExist(email)) {
+    return res.status(401).send('The email you entered has been used. Please enter another email.')
+  }
+
+  // create our new user object
+  const newUserId = generateRandomString();
+
+  const newUser = {
+    id: newUserId,
+    email,
+    password
+  }
+
+  // add our new user to the users object
+  users[newUserId] = newUser;
+  console.log(users);
+  // redirect the user to the login page
+  res.cookie('user_id', newUserId);
+  res.redirect('/urls');
+});
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
