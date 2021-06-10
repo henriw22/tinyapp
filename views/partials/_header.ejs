@@ -11,15 +11,17 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <% if (user) { %>
+        <div class="navbar-nav">
         <form class="form-inline" action="/logout" method="POST">
-          <span style="margin-right: 1em">Logged In As: <%= user.email %>!</span>
+          <span class="font-weight-bold nav-item nav-link" style="margin-right: 1em">Logged In As: <%= user.email %>!</span>
           <button type="submit" class="btn btn-outline-dark">Logout</button>
         </form>
-      <% } else { %>
-        <form class="form-inline" action="/login" method="POST">
-          <input class="form-control" type="text" name="username" placeholder="Email" style="width: 200px; margin-right: 0.5em">
-          <button type="submit" class="btn btn-outline-dark">Login</button>
-        </form>
+        </div>
+        <% } else { %>
+        <div class="navbar-nav">
+          <a class="font-weight-bold nav-item nav-link"  href="/register">Register</a>
+          <a class="font-weight-bold nav-item nav-link"  href="/login">Login</a>
+        </div>
       <% } %>
     </div>
   </nav>
