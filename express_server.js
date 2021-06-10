@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 // middleware
 app.use(cookieParser());
@@ -47,6 +48,7 @@ app.post('/register', (req, res) => {
   // grab the information from the body
   const password = req.body.password;
   const email = req.body.email;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!password || !email) {
     return res.status(400).send('You must enter an email AND a password');
@@ -61,7 +63,7 @@ app.post('/register', (req, res) => {
   const newUser = {
     id: newUserId,
     email,
-    password
+    password: hashedPassword
   };
 
   // add our new user to the users object
