@@ -54,7 +54,6 @@ app.post('/register', (req, res) => {
 
   // create our new user object
   const newUserId = generateRandomString();
-
   const newUser = {
     id: newUserId,
     email,
@@ -63,17 +62,40 @@ app.post('/register', (req, res) => {
 
   // add our new user to the users object
   users[newUserId] = newUser;
-  console.log(users);
+  // console.log(users);
   // redirect the user to the login page
   res.cookie('user_id', newUserId);
   res.redirect('/urls');
 });
 
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');    
+app.post('/login', (req, res) => {
+  // pull the info off the body
+  const email = req.body.email;
+  const password = req.body.password;
+  // console.log(checkUserExist(email));
+  if (!checkUserExist(email)) {
+    return res.status(403).send('Email could not be found.');
+  }
+  
+  let registeredUser;
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      registeredUser = user;
+    }
+  }
+
+  // compare the user's password
+  if (registeredUser.password !== password) {
+    // if the passwords don't match, send back an error response
+    return res.status(403).send('Email and password do not match');
+  }
+
+  // set the cookie and redirect to the protected page
+  res.cookie('user_id', registeredUser.id);
+  res.redirect('/urls');
 });
+
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
@@ -81,16 +103,16 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);  // Log the POST request body to the console
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
-  console.log(urlDatabase);
+  // console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);
   const longURL = req.body.longURL;
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = longURL;

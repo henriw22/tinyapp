@@ -12,16 +12,16 @@
   <header> <%- include('partials/_header') %> </header>
   <main style="margin: 1em;">
     <h3>Login</h3>
-    <form method="POST" action="/register">
-      <div>
-      <label>Email</label>
-      <input name="email" type="email" required style="width: 300px; margin: 0.5em"/>
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label for="formGroupExampleInput">Email address</label>
+        <input name="email" type="email" class="form-control" id="formGroupExampleInput" placeholder="Enter email" style="width: 325px" required >
       </div>
-      <div>
-      <label>Password</label>
-      <input name="password" type="password" style="width: 300px; margin: 0.5em" />
+      <div class="form-group">
+        <label for="formGroupExampleInput">Password</label>
+        <input name="password" type="password" class="form-control" id="formGroupExampleInput" placeholder="Password" style="width: 325px" >
       </div>
-      <button type="submit" class="btn btn-success">Login</button>
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
   </main>
   <!-- Bootstrap JS -->
