@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca"},
-  "9sm5xK": { longURL: "http://www.google.com"}
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID"}
 };
 
 const users = { 
@@ -132,7 +132,9 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
+  const id = req.cookies["user_id"];
+  const urls = urlsForUser(id);
+  const templateVars = { urls, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
@@ -156,7 +158,20 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]] };
+  let error_message = '';
+  if (!users[req.cookies["user_id"]]) {
+    error_message = 'You have not logged in, please log in';
+  } else if (!urlDatabase[req.params.shortURL]) {
+    error_message = 'Short url data does not exist, please add a new url';
+  } else if (urlDatabase[req.params.shortURL].userID !== req.cookies["user_id"]) {
+    error_message = 'You don\'t have access to this short urls';
+  }
+  const templateVars = { 
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL], 
+    user: users[req.cookies["user_id"]],
+    error_message
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -190,7 +205,15 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
+const urlsForUser = (id) => {
+  let result = {}
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      result[key] = urlDatabase[key];
+    }
+  }
+  return result;
+}
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6)
