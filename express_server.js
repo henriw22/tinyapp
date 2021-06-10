@@ -25,6 +25,11 @@ const users = {
     id: "user2RandomID", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+  "asa": {
+    id: "asa",
+    email: "a@a.com",
+    password: "123",
   }
 }
 
@@ -115,9 +120,12 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:shortURL", (req, res) => {
   // console.log(req.body);
+  const userId = req.cookies["user_id"];
   const longURL = req.body.longURL;
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = longURL;
+  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userId) {
+    urlDatabase[shortURL].longURL = longURL;
+  }
   res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
 });
 
@@ -195,9 +203,11 @@ app.post('/urls/:url/edit', (req, res) => {
 
 
 app.post('/urls/:url/delete', (req, res) => {
+  const userId = req.cookies["user_id"];
   const urlToBeDeleted = req.params.url;
-  delete urlDatabase[urlToBeDeleted];
-
+  if (urlDatabase[urlToBeDeleted] && urlDatabase[urlToBeDeleted].userID === userId) {
+    delete urlDatabase[urlToBeDeleted];
+  }
   res.redirect('/urls');
 });
 
