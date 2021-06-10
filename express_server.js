@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 // middleware
 app.use(cookieParser());
@@ -15,15 +15,15 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID"}
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   },
   "asa": {
@@ -31,7 +31,7 @@ const users = {
     email: "a@a.com",
     password: "123",
   }
-}
+};
 
 const checkUserExist = (email) => {
   const keys = Object.keys(users);
@@ -41,8 +41,7 @@ const checkUserExist = (email) => {
     }
   }
   return false;
-}
-
+};
 
 app.post('/register', (req, res) => {
   // grab the information from the body
@@ -54,7 +53,7 @@ app.post('/register', (req, res) => {
   }
 
   if (checkUserExist(email)) {
-    return res.status(400).send('The email you entered has been used. Please enter another email.')
+    return res.status(400).send('The email you entered has been used. Please enter another email.');
   }
 
   // create our new user object
@@ -63,7 +62,7 @@ app.post('/register', (req, res) => {
     id: newUserId,
     email,
     password
-  }
+  };
 
   // add our new user to the users object
   users[newUserId] = newUser;
@@ -101,10 +100,9 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
-
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');    
+  res.redirect('/urls');
 });
 
 app.post("/urls", (req, res) => {
@@ -149,7 +147,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userID = req.cookies["user_id"];
   const user = users[userID];
-  const templateVars = { user: users[req.cookies["user_id"]] }
+  const templateVars = { user: users[req.cookies["user_id"]] };
   console.log(users);
   console.log(user);
   // for (const index in users) { }
@@ -161,24 +159,30 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL])  {
+    return res.status(410).send('The url you are using is no longer active.');
+  }
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let error_message = '';
-  if (!users[req.cookies["user_id"]]) {
-    error_message = 'You have not logged in, please log in';
-  } else if (!urlDatabase[req.params.shortURL]) {
-    error_message = 'Short url data does not exist, please add a new url';
-  } else if (urlDatabase[req.params.shortURL].userID !== req.cookies["user_id"]) {
-    error_message = 'You don\'t have access to this short urls';
+  const userId = req.cookies["user_id"];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  let errorMessage = '';
+  if (!users[userId]) {
+    errorMessage = 'You have not logged in, please log in';
+  } else if (!longURL) {
+    errorMessage = 'Short url data does not exist, please add a new url';
+  } else if (longURL.userID !== userId) {
+    errorMessage = 'You don\'t have access to this short urls';
   }
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL], 
-    user: users[req.cookies["user_id"]],
-    error_message
+  const templateVars = {
+    shortURL,
+    longURL,
+    user: users[userId],
+    errorMessage
   };
   res.render("urls_show", templateVars);
 });
@@ -201,7 +205,6 @@ app.post('/urls/:url/edit', (req, res) => {
   res.redirect(`/urls/${urlToBeEdited}`);
 });
 
-
 app.post('/urls/:url/delete', (req, res) => {
   const userId = req.cookies["user_id"];
   const urlToBeDeleted = req.params.url;
@@ -216,15 +219,15 @@ app.listen(PORT, () => {
 });
 
 const urlsForUser = (id) => {
-  let result = {}
+  let result = {};
   for (let key in urlDatabase) {
     if (urlDatabase[key].userID === id) {
       result[key] = urlDatabase[key];
     }
   }
   return result;
-}
+};
 
-function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6)
-}
+const generateRandomString = () => {
+  return Math.random().toString(36).substr(2, 6);
+};
