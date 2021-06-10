@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 // const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
+const getUserByEmail = require('./helpers.js');
 
 // middleware
 // app.use(cookieParser());
@@ -225,17 +226,3 @@ const generateRandomString = () => {
   return Math.random().toString(36).substr(2, 6);
 };
 
-const getUserByEmail = function(email, database) {
-  // lookup magic...
-  let user;
-  const keys = Object.keys(database);
-  for (let key of keys) {
-    if (database[key].email === email) {
-      user = database[key];
-    }
-  }
-  return user;
-};
-
-// const user = getUserByEmail('a@a.com', users);
-// console.log(user);
