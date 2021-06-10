@@ -30,7 +30,7 @@ const users = {
   "asa": {
     id: "asa",
     email: "a@a.com",
-    password: "123",
+    password: "$2a$10$5TFs7G5QZosHWC8EyCV1IOKbawtxzxC5.jd.iDMOHuCSYqVPv7O2C",
   }
 };
 
@@ -90,9 +90,10 @@ app.post('/login', (req, res) => {
       registeredUser = user;
     }
   }
+  const regUserPass = registeredUser.password;
 
   // compare the user's password
-  if (registeredUser.password !== password) {
+  if (!bcrypt.compareSync(password, regUserPass)) {
     // if the passwords don't match, send back an error response
     return res.status(403).send('Email and password do not match');
   }
