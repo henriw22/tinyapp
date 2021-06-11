@@ -3,12 +3,10 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-// const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const getUserByEmail = require('./helpers.js');
 
 // middleware
-// app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -39,6 +37,7 @@ const users = {
   }
 };
 
+// handling the form from the registration page
 app.post('/register', (req, res) => {
   // grab the information from the body
   const password = req.body.password;
@@ -63,13 +62,13 @@ app.post('/register', (req, res) => {
 
   // add our new user to the users object
   users[newUserId] = newUser;
-  console.log(users);
+
   // redirect the user to the login page
-  // res.cookie('user_id', newUserId);
   req.session.user_id = newUserId;
   res.redirect('/urls');
 });
 
+// handling the form from the login page
 app.post('/login', (req, res) => {
   // pull the info off the body
   const email = req.body.email;
@@ -93,46 +92,46 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
+// handling logout button
 app.post("/logout", (req, res) => {
-  // res.clearCookie('user_id');
   req.session = null;
   res.redirect('/urls');
 });
 
+// adding new short url
 app.post("/urls", (req, res) => {
-  // console.log(req.body);  // Log the POST request body to the console
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  // const userID = req.cookies["user_id"];
   const userID = req.session.user_id;
 
   urlDatabase[shortURL] = {longURL, userID};
-  console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${shortURL}`);
 });
 
+// reassigning the value of shortURL
 app.post("/urls/:shortURL", (req, res) => {
-  // console.log(req.body);
-  // const userId = req.cookies["user_id"];
   const userId = req.session.user_id;
   const longURL = req.body.longURL;
   const shortURL = req.params.shortURL;
   if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === userId) {
     urlDatabase[shortURL].longURL = longURL;
   }
-  res.redirect('/urls');         // Respond with 'Ok' (we will replace this)
+  res.redirect('/urls');
 });
 
+// registration page display
 app.get("/register", (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.session.user_id] };
   res.render("urls_register", templateVars);
 });
 
+// login page display
 app.get("/login", (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.session.user_id] };
   res.render("urls_login", templateVars);
 });
 
+// main page display
 app.get("/urls", (req, res) => {
   const id = req.session.user_id;
   const urls = urlsForUser(id);
@@ -140,17 +139,19 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// adding new url page display
 app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
   const templateVars = { user: users[userID] };
-  // for (const index in users) { }
+
   if (!user) {
     return res.redirect("/login");
   }
   res.render("urls_new", templateVars);
 });
 
+// shortURL hyperlink
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL])  {
@@ -160,6 +161,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// shorURL and edit display page
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
