@@ -82,14 +82,14 @@ app.post('/login', (req, res) => {
   }
   
   // compare the user's password
-  const regUserPass = registeredUser.password;
+  const regUserPass = users[registeredUser].password;
   if (!bcrypt.compareSync(password, regUserPass)) {
     // if the passwords don't match, send back an error response
     return res.status(403).send('Email and password do not match');
   }
 
   // set the cookie and redirect to the protected page
-  req.session.user_id = registeredUser.id;
+  req.session.user_id = users[registeredUser].id;
   res.redirect('/urls');
 });
 

@@ -4,7 +4,7 @@ const getUserByEmail = function(email, database) {
   const keys = Object.keys(database);
   for (let key of keys) {
     if (database[key].email === email) {
-      user = database[key];
+      user = key;
     }
   }
   return user;
