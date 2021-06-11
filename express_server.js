@@ -5,14 +5,17 @@ const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const getUserByEmail = require('./helpers.js');
+const methodOverride = require('method-override')
 
 // middleware
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
-app.set("view engine", "ejs");
+app.use(methodOverride('_method'));
+
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
@@ -69,7 +72,7 @@ app.post('/register', (req, res) => {
 });
 
 // handling the form from the login page
-app.post('/login', (req, res) => {
+app.patch('/login', (req, res) => {
   // pull the info off the body
   const email = req.body.email;
   const password = req.body.password;
@@ -109,7 +112,7 @@ app.post("/urls", (req, res) => {
 });
 
 // reassigning the value of shortURL
-app.post("/urls/:shortURL", (req, res) => {
+app.patch("/urls/:shortURL", (req, res) => {
   const userId = req.session.user_id;
   const longURL = req.body.longURL;
   const shortURL = req.params.shortURL;
@@ -144,7 +147,7 @@ app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
   const templateVars = { user: users[userID] };
-
+  
   if (!user) {
     return res.redirect("/login");
   }
@@ -201,7 +204,7 @@ app.post('/urls/:url/edit', (req, res) => {
   res.redirect(`/urls/${urlToBeEdited}`);
 });
 
-app.post('/urls/:url/delete', (req, res) => {
+app.delete('/urls/:url/delete', (req, res) => {
   const userId = req.session.user_id;
   const urlToBeDeleted = req.params.url;
   if (urlDatabase[urlToBeDeleted] && urlDatabase[urlToBeDeleted].userID === userId) {

@@ -12,7 +12,7 @@
   <header> <%- include('partials/_header') %> </header>
   <main style="margin: 1em;">
     <h3>Login</h3>
-    <form method="POST" action="/login">
+    <form method="POST" action="/login?_method=PATCH">
       <div class="form-group">
         <label for="formGroupExampleInput">Email address</label>
         <input name="email" type="email" class="form-control" id="formGroupExampleInput" placeholder="Enter email" style="width: 325px" required >

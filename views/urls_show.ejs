@@ -18,7 +18,7 @@
       </div>
       <div class="card-body">
         <h3 class="card-title">Edit</h3>
-        <form action="/urls/<%= shortURL %>" method="POST">
+        <form action="/urls/<%= shortURL %>?_method=PATCH" method="POST">
           <label for="longURL">New URL:</label>
           <input type="text" name="longURL" style="width: 300px; margin: 1em">
           <button type="submit" class="btn btn-primary">Submit</button>
